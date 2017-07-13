@@ -31,6 +31,9 @@ devices, new ones can be studied.
     isnumber=8367>}
 
 """
+
+#from __future__ import absolute_import
+
 from builtins import zip
 from builtins import range
 from builtins import object
@@ -38,7 +41,8 @@ from builtins import object
 __author__ = 'Lorenzo Bolla'
 
 import numpy
-import EMpy.utils
+#import EMpy.utils   # broken in python 3
+from . import utils
 from functools import reduce
 
 
@@ -850,8 +854,7 @@ class NRR(Device):
 
     >>> wls = numpy.linspace(1.5e-6, 1.6e-6, 1000)
     >>> from EMpy.devices import Coupler
-    >>> couplers = [Coupler(wls, 0.08**.5), Coupler(wls, 0.003**.5),
-        Coupler(wls, 0.08**.5)]
+    >>> couplers = [Coupler(wls, 0.08**.5), Coupler(wls, 0.003**.5), Coupler(wls, 0.08**.5)]
     >>> q = [1., 1., 1.]
     >>> R = 5e-6
     >>> l1s = [numpy.pi * R, numpy.pi * R]
@@ -1336,7 +1339,7 @@ class Etalon(Device):
         self.FSRwl = self.wl0 ** 2 / \
             (2 * n * l * numpy.cos(self.theta) + self.wl0)
 
-        (self.f0, self.FSR) = EMpy.utils.wl2f(self.wl0, self.FSRwl)
+        (self.f0, self.FSR) = utils.wl2f(self.wl0, self.FSRwl)
 
         self.FINESSE = numpy.pi / (2 * numpy.arcsin(1. / numpy.sqrt(self.F)))
         # self.FINESSE = numpy.pi * numpy.sqrt(self.F) / 2.

@@ -10,7 +10,7 @@
 @see: http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=12734&objectType=FILE
 
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 from builtins import zip
 from builtins import str
 from builtins import range
@@ -18,9 +18,8 @@ from builtins import range
 import numpy
 import scipy
 import scipy.optimize
-import EMpy.utils
-from EMpy.modesolvers.interface import *
-
+from .. import utils
+from .interface import *
 
 class SVFDModeSolver(ModeSolver):
 
@@ -931,9 +930,9 @@ class VFDModeSolver(ModeSolver):
             v = n.reshape(nx, ny)[:-1, :-1]
 
             # in xc e yc
-            Dx = neff * EMpy.utils.centered2d(Hy) + (
+            Dx = neff * utils.centered2d(Hy) + (
                 Hz[:-1, 1:] + Hz[1:, 1:] - Hz[:-1, :-1] - Hz[1:, :-1]) / (2j * k * v)
-            Dy = -neff * EMpy.utils.centered2d(Hx) - (
+            Dy = -neff * utils.centered2d(Hx) - (
                 Hz[1:, :-1] + Hz[1:, 1:] - Hz[:-1, 1:] - Hz[:-1, :-1]) / (2j * k * h)
             Dz = ((Hy[1:, :-1] + Hy[1:, 1:] - Hy[:-1, 1:] - Hy[:-1, :-1]) / (2 * h) -
                   (Hx[:-1, 1:] + Hx[1:, 1:] - Hx[:-1, :-1] - Hx[1:, :-1]) / (2 * v)) / (1j * k)
@@ -1090,21 +1089,21 @@ class FDMode(Mode):
             y0 = self.y
         else:
             # electric fields and intensity are centered
-            x0 = EMpy.utils.centered1d(self.x)
-            y0 = EMpy.utils.centered1d(self.y)
+            x0 = utils.centered1d(self.x)
+            y0 = utils.centered1d(self.y)
 
-        return EMpy.utils.interp2(x, y, x0, y0, f)
+        return utils.interp2(x, y, x0, y0, f)
 
     def intensityTETM(self, x=None, y=None):
-        I_TE = self.Ex * EMpy.utils.centered2d(numpy.conj(self.Hy)) / 2.
-        I_TM = -self.Ey * EMpy.utils.centered2d(numpy.conj(self.Hx)) / 2.
+        I_TE = self.Ex * utils.centered2d(numpy.conj(self.Hy)) / 2.
+        I_TM = -self.Ey * utils.centered2d(numpy.conj(self.Hx)) / 2.
         if x is None and y is None:
             return (I_TE, I_TM)
         else:
-            x0 = EMpy.utils.centered1d(self.x)
-            y0 = EMpy.utils.centered1d(self.y)
-            I_TE_ = EMpy.utils.interp2(x, y, x0, y0, I_TE)
-            I_TM_ = EMpy.utils.interp2(x, y, x0, y0, I_TM)
+            x0 = utils.centered1d(self.x)
+            y0 = utils.centered1d(self.y)
+            I_TE_ = utils.interp2(x, y, x0, y0, I_TE)
+            I_TM_ = utils.interp2(x, y, x0, y0, I_TM)
             return (I_TE_, I_TM_)
 
     def intensity(self, x=None, y=None):
@@ -1113,22 +1112,22 @@ class FDMode(Mode):
 
     def TEfrac(self, x_=None, y_=None):
         if x_ is None:
-            x = EMpy.utils.centered1d(self.x)
+            x = utils.centered1d(self.x)
         else:
             x = x_
         if y_ is None:
-            y = EMpy.utils.centered1d(self.y)
+            y = utils.centered1d(self.y)
         else:
             y = y_
         STE, STM = self.intensityTETM(x_, y_)
-        num = EMpy.utils.trapz2(numpy.abs(STE), x=x, y=y)
-        den = EMpy.utils.trapz2(numpy.abs(STE) + numpy.abs(STM), x=x, y=y)
+        num = utils.trapz2(numpy.abs(STE), x=x, y=y)
+        den = utils.trapz2(numpy.abs(STE) + numpy.abs(STM), x=x, y=y)
         return num / den
 
     def norm(self):
-        x = EMpy.utils.centered1d(self.x)
-        y = EMpy.utils.centered1d(self.y)
-        return scipy.sqrt(EMpy.utils.trapz2(self.intensity(), x=x, y=y))
+        x = utils.centered1d(self.x)
+        y = utils.centered1d(self.y)
+        return scipy.sqrt(utils.trapz2(self.intensity(), x=x, y=y))
 
     def normalize(self):
         n = self.norm()
@@ -1143,11 +1142,11 @@ class FDMode(Mode):
 
     def overlap(self, m, x=None, y=None):
 
-        x1 = EMpy.utils.centered1d(self.x)
-        y1 = EMpy.utils.centered1d(self.y)
+        x1 = utils.centered1d(self.x)
+        y1 = utils.centered1d(self.y)
 
-        x2 = EMpy.utils.centered1d(m.x)
-        y2 = EMpy.utils.centered1d(m.y)
+        x2 = utils.centered1d(m.x)
+        y2 = utils.centered1d(m.y)
 
         if x is None:
             x = x2
@@ -1156,15 +1155,15 @@ class FDMode(Mode):
             y = y2
 
         # Interpolates m1 onto m2 grid:
-        Ex1 = EMpy.utils.interp2(x, y, x1, y1, self.Ex)
-        Ey1 = EMpy.utils.interp2(x, y, x1, y1, self.Ey)
-        Hx2 = EMpy.utils.interp2(x, y, x2, y2, m.Hx)
-        Hy2 = EMpy.utils.interp2(x, y, x2, y2, m.Hy)
+        Ex1 = utils.interp2(x, y, x1, y1, self.Ex)
+        Ey1 = utils.interp2(x, y, x1, y1, self.Ey)
+        Hx2 = utils.interp2(x, y, x2, y2, m.Hx)
+        Hy2 = utils.interp2(x, y, x2, y2, m.Hy)
 
-        intensity = (Ex1 * EMpy.utils.centered2d(numpy.conj(Hy2)) -
-                     Ey1 * EMpy.utils.centered2d(numpy.conj(Hx2))) / 2.
+        intensity = (Ex1 * utils.centered2d(numpy.conj(Hy2)) -
+                     Ey1 * utils.centered2d(numpy.conj(Hx2))) / 2.
 
-        return EMpy.utils.trapz2(intensity, x=x, y=y)
+        return utils.trapz2(intensity, x=x, y=y)
 
     def get_fields_for_FDTD(self, x=None, y=None):
         """Get mode's field on a staggered grid.
@@ -1179,43 +1178,43 @@ class FDMode(Mode):
             y = self.y
 
         # Ex: ignores y = 0, max
-        x_Ex = EMpy.utils.centered1d(self.x)
-        y_Ex = EMpy.utils.centered1d(self.y)
-        x_Ex_FDTD = EMpy.utils.centered1d(x)
+        x_Ex = utils.centered1d(self.x)
+        y_Ex = utils.centered1d(self.y)
+        x_Ex_FDTD = utils.centered1d(x)
         y_Ex_FDTD = y[1:-1]
-        Ex_FDTD = EMpy.utils.interp2(x_Ex_FDTD, y_Ex_FDTD, x_Ex, y_Ex, self.Ex)
+        Ex_FDTD = utils.interp2(x_Ex_FDTD, y_Ex_FDTD, x_Ex, y_Ex, self.Ex)
         # Ey: ignores x = 0, max
-        x_Ey = EMpy.utils.centered1d(self.x)
-        y_Ey = EMpy.utils.centered1d(self.y)
+        x_Ey = utils.centered1d(self.x)
+        y_Ey = utils.centered1d(self.y)
         x_Ey_FDTD = x[1:-1]
-        y_Ey_FDTD = EMpy.utils.centered1d(y)
-        Ey_FDTD = EMpy.utils.interp2(x_Ey_FDTD, y_Ey_FDTD, x_Ey, y_Ey, self.Ey)
+        y_Ey_FDTD = utils.centered1d(y)
+        Ey_FDTD = utils.interp2(x_Ey_FDTD, y_Ey_FDTD, x_Ey, y_Ey, self.Ey)
         # Ez: ignores x, y = 0, max
-        x_Ez = EMpy.utils.centered1d(self.x)
-        y_Ez = EMpy.utils.centered1d(self.y)
+        x_Ez = utils.centered1d(self.x)
+        y_Ez = utils.centered1d(self.y)
         x_Ez_FDTD = x[1:-1]
         y_Ez_FDTD = y[1:-1]
-        Ez_FDTD = EMpy.utils.interp2(x_Ez_FDTD, y_Ez_FDTD, x_Ez, y_Ez, self.Ez)
+        Ez_FDTD = utils.interp2(x_Ez_FDTD, y_Ez_FDTD, x_Ez, y_Ez, self.Ez)
         # Hx: ignores x = 0, max, /120pi, reverse direction
         x_Hx = self.x
         y_Hx = self.y
         x_Hx_FDTD = x[1:-1]
-        y_Hx_FDTD = EMpy.utils.centered1d(y)
-        Hx_FDTD = EMpy.utils.interp2(
+        y_Hx_FDTD = utils.centered1d(y)
+        Hx_FDTD = utils.interp2(
             x_Hx_FDTD, y_Hx_FDTD, x_Hx, y_Hx, self.Hx) / (-120. * numpy.pi)
         # Hy: ignores y = 0, max, /120pi, reverse direction
         x_Hy = self.x
         y_Hy = self.y
-        x_Hy_FDTD = EMpy.utils.centered1d(x)
+        x_Hy_FDTD = utils.centered1d(x)
         y_Hy_FDTD = y[1:-1]
-        Hy_FDTD = EMpy.utils.interp2(
+        Hy_FDTD = utils.interp2(
             x_Hy_FDTD, y_Hy_FDTD, x_Hy, y_Hy, self.Hy) / (-120. * numpy.pi)
         # Hz: /120pi, reverse direction
         x_Hz = self.x
         y_Hz = self.y
-        x_Hz_FDTD = EMpy.utils.centered1d(x)
-        y_Hz_FDTD = EMpy.utils.centered1d(y)
-        Hz_FDTD = EMpy.utils.interp2(
+        x_Hz_FDTD = utils.centered1d(x)
+        y_Hz_FDTD = utils.centered1d(y)
+        Hz_FDTD = utils.interp2(
             x_Hz_FDTD, y_Hz_FDTD, x_Hz, y_Hz, self.Hz) / (-120. * numpy.pi)
 
         return (Ex_FDTD, Ey_FDTD, Ez_FDTD, Hx_FDTD, Hy_FDTD, Hz_FDTD)
@@ -1233,25 +1232,25 @@ class FDMode(Mode):
 
     def plot_Ex(self, x=None, y=None):
         if x is None:
-            x = EMpy.utils.centered1d(self.x)
+            x = utils.centered1d(self.x)
         if y is None:
-            y = EMpy.utils.centered1d(self.y)
+            y = utils.centered1d(self.y)
         Ex = self.get_field('Ex', x, y)
         self.plot_field(x, y, Ex)
 
     def plot_Ey(self, x=None, y=None):
         if x is None:
-            x = EMpy.utils.centered1d(self.x)
+            x = utils.centered1d(self.x)
         if y is None:
-            y = EMpy.utils.centered1d(self.y)
+            y = utils.centered1d(self.y)
         Ey = self.get_field('Ey', x, y)
         self.plot_field(x, y, Ey)
 
     def plot_Ez(self, x=None, y=None):
         if x is None:
-            x = EMpy.utils.centered1d(self.x)
+            x = utils.centered1d(self.x)
         if y is None:
-            y = EMpy.utils.centered1d(self.y)
+            y = utils.centered1d(self.y)
         Ez = self.get_field('Ez', x, y)
         self.plot_field(x, y, Ez)
 
@@ -1280,8 +1279,8 @@ class FDMode(Mode):
         self.plot_field(x, y, Hz)
 
     def plot_intensity(self):
-        x = EMpy.utils.centered1d(self.x)
-        y = EMpy.utils.centered1d(self.y)
+        x = utils.centered1d(self.x)
+        y = utils.centered1d(self.y)
         I = self.intensity(x, y)
         self.plot_field(x, y, I)
 

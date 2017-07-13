@@ -1,7 +1,8 @@
 from builtins import object
 #-*- coding: UTF-8 -*-
 import numpy
-import EMpy
+from . import constants
+from . import utils  # import EMpy
 
 __author__ = 'Julien Hillairet'
 
@@ -43,7 +44,7 @@ def stack(X,Y,Z):
       >>> import numpy
       >>> X = numpy.arange(4); Y = numpy.arange(3); Z = numpy.arange(2) 
       >>> S = field.stack(X,Y,Z)
-      >>> print S
+      >>> print(S)
       [[ 0.  0.  0.  0.  0.  0.  1.  1.  1.  1.  1.  1.  2.  2.  2.  2.  2.  2.  3.  3.  3.  3.  3.  3.]
        [ 0.  0.  1.  1.  2.  2.  0.  0.  1.  1.  2.  2.  0.  0.  1.  1.  2.  2.  0.  0.  1.  1.  2.  2.]
        [ 0.  1.  0.  1.  0.  1.  0.  1.  0.  1.  0.  1.  0.  1.  0.  1.  0.  1.  0.  1.  0.  1.  0.  1.]]
@@ -81,7 +82,7 @@ def matlab_dot(a,b):
   Example
   =======
       >>> a=numpy.array([1,2,3]).repeat(6).reshape((3,6))
-      >>> print a
+      >>> print(a)
       [[1 1 1 1 1 1]
        [2 2 2 2 2 2]
        [3 3 3 3 3 3]]
@@ -143,12 +144,12 @@ def currentsScatteringKottler(P,J,M,Q,dS,f,epsr=1):
      numpy.size(Q,axis=0)!=3 or \
      numpy.size(J,axis=0)!=3 or \
      numpy.size(M,axis=0)!=3:
-    EMpy.utils.warning('Bad parameters size : number of rows must be 3 for vectors P,Q,J,M')
+     utils.warning('Bad parameters size : number of rows must be 3 for vectors P,Q,J,M')
   
   if not numpy.size(Q,axis=1)==numpy.size(J,axis=1)==numpy.size(M,axis=1)==numpy.size(dS,axis=1):
-    EMpy.utils.warning('Bad parameters size : number of columns between Q,J,M and dS must be equal')
+     utils.warning('Bad parameters size : number of columns between Q,J,M and dS must be equal')
   
-  lambda0 = EMpy.constants.c/f  
+  lambda0 = constants.c/f  
   lambdam = lambda0/numpy.sqrt(epsr)
   #k0 = 2*numpy.pi/lambda0
   km = 2*numpy.pi/lambdam 
@@ -161,7 +162,7 @@ def currentsScatteringKottler(P,J,M,Q,dS,f,epsr=1):
                 numpy.zeros((3,NbP), dtype=complex), P)
   
   # for all observation point
-  #PB = EMpy.utils.ProgressBar()
+  #PB = utils.ProgressBar()
   for ind in numpy.arange(NbP):
     # distance between scattering and observation point
     QP = P[:,ind].reshape((3,1)) * numpy.ones((1,NbQ)) - Q

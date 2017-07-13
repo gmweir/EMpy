@@ -5,9 +5,8 @@ from builtins import zip
 from builtins import object
 
 import numpy
-import EMpy.utils
-import EMpy.modesolvers
-from EMpy.modesolvers.interface import *
+#from . import utils # import EMpy.utils
+from .interface import *   # from EMpy.modesolvers.interface import *
 import pylab
 
 def S2T(S):

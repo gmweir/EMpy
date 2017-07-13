@@ -11,7 +11,7 @@ from functools import partial
 
 import numpy
 from scipy.integrate import quad
-from EMpy.constants import eps0
+from .constants import eps0
 
 __author__ = 'Lorenzo Bolla'
 
